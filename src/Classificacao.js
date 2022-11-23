@@ -35,11 +35,11 @@ const Classificacao = () => {
     <div><button onClick={()=> carregaClassificacao()}>Classificacao</button><button onClick={()=> carregaPlacarJogo()}>Placar Jogo</button><button onClick={()=> carregaPlacarJogador()}>Placar Jogador</button>
         <div>
         
-        
+        <table>
         {classificacaoList && classificacaoList.map(i => (
-          <li>{++posicao} {i.nome} - {i.valorResultadoTotal}</li>
+          <li>{++posicao}  {i.nome} - {i.valorResultadoTotal}</li>
       ))}
-      
+      </table>
       </div>
       <div>
       {placarJogoList && placarJogoList.map(i => (
