@@ -1,60 +1,51 @@
-import React, {useEffect, useState} from "react";
-import ClassificacaoService from "./ClassificacaoService";
-
-const Classificacao = () => {
-  const [classificacaoList, setClassificacaoList] = useState([])
-  const [placarJogoList, setPlacarJogoList] = useState([])
-  const [placarJogadorList, setPlacarJogadorList] = useState([])
-  var posicao = 0;
-  const classificacaoService = ClassificacaoService();
-
-    async function carregaClassificacao(){
-        // setClassificacaoList(classificacaoService.listarClassificacao()) 
-        const data = await classificacaoService.listarClassificacao()
-        console.log(data)
-        setClassificacaoList(data)
-    }
-
-    async function carregaPlacarJogo(){
-      // setClassificacaoList(classificacaoService.listarClassificacao()) 
-      const data = await classificacaoService.listarPlacarJogo()
-      console.log(data)
-      setPlacarJogoList(data)
-  }
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom';
+import { URLENV } from './CONSTANTS';
 
 
-  async function carregaPlacarJogador(){
-    // setClassificacaoList(classificacaoService.listarClassificacao()) 
-    const data = await classificacaoService.listarPlacarJogador()
-    console.log(data)
-    setPlacarJogadorList(data)
-}
 
 
-  return (
-    <div><button onClick={()=> carregaClassificacao()}>Classificacao</button><button onClick={()=> carregaPlacarJogo()}>Placar Jogo</button><button onClick={()=> carregaPlacarJogador()}>Placar Jogador</button>
-        <div>
+const Classificacao = () => {    
+    const [classificacalLista, setClassificacaoLista] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
+    const {idBolao} = useParams()
+
+    useEffect(() => {
+        setIsLoading(true)
+        axios.get(`${URLENV}/${idBolao}/classificacao`)
+            .then(response => {
+                console.log(response.data)
+                setClassificacaoLista(response.data)
+                setIsLoading(false)
+            })
+    
+    },[])
+
+    var i =0;
+    return (
+
+            isLoading?<div><div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          </div>:
+            <div>
+            <label>Classificação Geral</label>
+            <table className="table table-striped table-hover">                
+                <thead><tr><th>#</th><th>Nome</th><th>Pontuação</th></tr></thead>
+                <tbody>
+                {classificacalLista && classificacalLista.map((c) => (
+                    // <tr key={c.idJogador}><td>{++i}</td> <td onClick={()=> {navigate(`placaresJogador/${c.idJogador}`)}}>{c.nome} - {c.artilheiro}</td><td>{c.valorJogos}+{c.valorArtilheiro} = *{c.valorResultadoTotal}*</td></tr>
+                    <tr key={c.idJogador}><td>{++i}</td> <td><Link to={`placaresJogador/${c.idJogador}`}>{c.nome} - {c.artilheiro}</Link></td><td>{c.valorJogos}+{c.valorArtilheiro} = <span class="badge bg-primary rounded-pill">{c.valorResultadoTotal}</span></td></tr>
+                ))}
+                </tbody>
+                </table>
+            </div>    
+
+
         
-        <table>
-        {classificacaoList && classificacaoList.map(i => (
-          <li>{++posicao}  {i.nome} - {i.valorResultadoTotal}</li>
-      ))}
-      </table>
-      </div>
-      <div>
-      {placarJogoList && placarJogoList.map(i => (
-          <li> {i.nomeJogador} - {i.palpite1} - {i.descricaoJogo} - {i.palpite2} = {i.valor}</li>
-      ))}
-      </div>
 
-      <div>
-      {placarJogadorList && placarJogadorList.map(i => (
-          <li> {i.nomeJogador} - {i.palpite1} - {i.descricaoJogo} - {i.palpite2} = {i.valor}</li>
-      ))}
-      </div>
-    </div>
-  );
+    )
 }
-
 
 export default Classificacao
